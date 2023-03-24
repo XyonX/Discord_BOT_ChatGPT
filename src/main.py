@@ -3,7 +3,7 @@ import os
 from dotenv import load_dotenv
 from discord.ext import commands
 
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='$', intents=intents)
 
 
@@ -14,10 +14,13 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+    print("Received message: ", message.content)
     if message.author == bot.user:
         return
-    if message.content.startswitch('$hello'):
+    if message.content.startswith('!hello'):
+        print("Sending response...")
         await message.channel.send('hello')
+
 
 load_dotenv()
 
