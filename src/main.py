@@ -1,19 +1,20 @@
 import discord
 import os
 from dotenv import load_dotenv
+from discord.ext import commands
 
-intent = discord.Intents.default()
-client = discord.Client(intents=intent)
+intents = discord.Intents.default()
+bot = commands.Bot(command_prefix='$', intents=intents)
 
 
-@client.event
+@bot.event
 async def on_ready():
-    print('bot logged in as : {0.user}'.format(client))
+    print('bot logged in as : {0.user}'.format(bot))
 
 
-@client.event
+@bot.event
 async def on_message(message):
-    if message.author == client.user:
+    if message.author == bot.user:
         return
     if message.content.startswitch('$hello'):
         await message.channel.send('hello')
@@ -21,7 +22,7 @@ async def on_message(message):
 load_dotenv()
 
 api_key = os.environ.get('Discord_Api')
-client.run(api_key)
+bot.run(api_key)
 
 
 
