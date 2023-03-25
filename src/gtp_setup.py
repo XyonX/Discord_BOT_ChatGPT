@@ -23,12 +23,13 @@ class gtp_api:
     }
 
     def __init__(self, env_api):
-        self.key = os.environ.get('env_api')
+        self.key = os.environ.get(env_api)
         self.headers = {"Authorization": f"Bearer {self.key}"}
 
     def set_payload(self,message):
 
-        self.payload = {
+
+        payload = {
             "model": "gpt-3.5-turbo",
             "messages": [{"role": "user", "content": message}],
             "temperature": 0.5,
@@ -36,6 +37,27 @@ class gtp_api:
             "n": 1,
             "stop": "\n",
         }
+        return payload
+
+    async def get_response(self,message):
+        self.payload =self.set_payload(message)
+
+        response = requests.post(self.endpoint, headers=self.headers, json=self.payload)
+        return response
+
+    async def send_message(self, response, channel):
+
+        if response.status_code == 200:
+            response_text = response.json()['choices'][0]['message']['content']
+            await channel.send(response_text)
+        else:
+            await channel.send("Error: Unable to get response from ChatGPT API.")
+
+    def log_response(self, response):
+        print('Responce Code : ', response.status_code)
+        print('Responce  : ', response.text)
+
+
 
 
 
