@@ -4,7 +4,7 @@ import openai
 import requests
 from dotenv import load_dotenv
 from discord.ext import commands
-from gtp_setup import gtp_api
+from gpt_setup import gpt_api
 load_dotenv()
 
 
@@ -40,20 +40,25 @@ class disco_api :
     def log_rnning(self):
         print('bot logged in as : {0.user}'.format(self.bot))
 
+    def log_message (self, message):
+        print(message)
+
+    def log_context(self, context):
+        print(context)
+
     def is_bot_message(self, message):
         if message.author == self.bot.user:
             return True
         else:
             return False
 
-    async def on_message(self,gtp_ref, message):
+    async def on_message(self,gpt_ref, message,context):
         if self.is_bot_message(message):
             return
 
-        msg = message.content[1:]
-        response = await gtp_api.get_response(gtp_ref,msg)
+        response = await gpt_api.get_response(gpt_ref, message, context)
         channel = message.channel
-        await gtp_api.send_message(gtp_ref,response, channel)
+        await gpt_api.send_message(gpt_ref, response, channel)
 
 
 

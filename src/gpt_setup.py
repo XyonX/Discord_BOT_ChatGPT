@@ -7,7 +7,7 @@ from discord.ext import commands
 load_dotenv()
 
 
-class gtp_api:
+class gpt_api:
 
 
     key = None
@@ -26,12 +26,24 @@ class gtp_api:
         self.key = os.environ.get(env_api)
         self.headers = {"Authorization": f"Bearer {self.key}"}
 
-    def set_payload(self,message):
+    async def get_context(self,message):
+        # Get the previous message if it exists
+        context = ""
+        async for m in message.channel.history(limit=2):
+            if m.id != message.id:
+                context = m.content
+                break
 
+        return context
+
+    def set_payload(self,message,context):
 
         payload = {
             "model": "gpt-3.5-turbo",
-            "messages": [{"role": "user", "content": message}],
+            "messages": [
+                {"role": "context", "content": context},
+                {"role": "user", "content": message}
+            ],
             "temperature": 0.5,
             "max_tokens": 60,
             "n": 1,
@@ -39,8 +51,8 @@ class gtp_api:
         }
         return payload
 
-    async def get_response(self,message):
-        self.payload =self.set_payload(message)
+    async def get_response(self,message,context):
+        self.payload =self.set_payload(message,context)
 
         response = requests.post(self.endpoint, headers=self.headers, json=self.payload)
         return response
